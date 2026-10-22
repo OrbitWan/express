@@ -4,7 +4,7 @@ Contracts and dapps on Wanchain, by [OrbitWan](https://orbitwan.io). Each contra
 
 | | Contract | Dapp |
 |---|---|---|
-| xWAN Express | [xwan/](xwan/) | https://express.orbitwan.io/xwan/ |
+| xWAN Express | [xwan/](xwan/) | https://express.orbitwan.io |
 
 ## The site
 
