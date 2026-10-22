@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; connect-src https://gwan-ssl.wandevs.org:56891; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>xWAN Express</title>
+<meta name="description" content="Sell xWAN now at the xWAN Express desk on Wanchain.">
+<link rel="icon" href="../shared/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+<header class="hdr">
+  <div class="hdrin">
+    <a class="brand" href="https://orbitwan.io"><svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#2D7FF9"/><circle cx="50" cy="50" r="32" fill="#FFFFFF"/><circle cx="50" cy="50" r="18" fill="#2D7FF9"/></svg>OrbitWan<span>Express</span></a>
+    <span class="acct" id="acct"></span>
+  </div>
+</header>
+<main>
+  <section class="card">
+    <h1>xWAN Express</h1>
+    <p class="sub">Sell xWAN now</p>
+
+    <label class="lbl" for="amount">You sell</label>
+    <div class="box"><input id="amount" inputmode="decimal" placeholder="0" autocomplete="off" spellcheck="false"><span class="tok">xWAN</span></div>
+    <div class="under"><span id="balrow" hidden>Balance <b id="bal">-</b></span><button class="max" id="max" type="button" hidden>MAX</button></div>
+
+    <span class="lbl">You receive</span>
+    <div class="box"><output id="out">0</output><span class="tok">WAN</span></div>
+
+    <div class="facts">
+      <div><span>Rate</span><span id="rate">-</span></div>
+      <div><span>Desk balance</span><a id="desk" href="https://orbitwan.io/address/0xcc0ba524134d9625b97569626106b671e6c492f2" target="_blank" rel="noopener">-</a></div>
+    </div>
+
+    <button class="btn" id="go" type="button">Connect wallet</button>
+    <p class="note" id="note" role="status"></p>
+  </section>
+</main>
+<footer>
+  <a href="https://github.com/OrbitWan" target="_blank" rel="noopener"><img src="../shared/github.svg" alt="OrbitWan on GitHub" width="20" height="20"></a>
+  <a href="https://x.com/orbitwanio" target="_blank" rel="noopener"><img src="../shared/x.svg" alt="OrbitWan on X" width="20" height="20"></a>
+</footer>
+<script src="../shared/ethers-6.17.0.umd.min.js"></script>
+<script src="../shared/wallet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
