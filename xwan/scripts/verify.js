@@ -4,8 +4,9 @@
 // npm run verify                  reads Wanchain mainnet through Wanchain's public RPC
 // RPC_URL=<your node> npm run verify   reads it through any Wanchain mainnet node you choose
 // It compiles the source, checks the fingerprints, writes the three immutables (xwan, treasury, admin) into the
-// compiled runtime code at the offsets solc reports, and compares the result byte for byte with eth_getCode.
-// All chain reads are pinned to one block.
+// compiled runtime code at the offsets solc reports, and compares the result byte for byte with eth_getCode; then it
+// checks that the getters return those addresses and MAX_RATE. All chain reads are pinned to one block, a few below
+// the head.
 const fs = require('fs');
 const solc = require('solc');
 const { ethers } = require('ethers');
@@ -74,29 +75,15 @@ async function main() {
   const chainId = Number(BigInt(await rpc('eth_chainId', [])));
   log(`chain id ${chainId}`);
   if (chainId !== CHAIN_ID) return fail('WRONG_CHAIN');
-  const block = await rpc('eth_blockNumber', []);
-  log(`block ${BigInt(block)}`);
+  // A few blocks below the head, so a load-balanced RPC whose nodes lag by a block still answers every read.
+  const head = BigInt(await rpc('eth_blockNumber', []));
+  const block = '0x' + (head > 5n ? head - 5n : head).toString(16);
+  log(`block ${BigInt(block)} (head ${head})`);
   const code = await rpc('eth_getCode', [DESK, block]);
   if (code === '0x') return fail('NO_CODE');
-  const iface = new ethers.Interface(d.abi);
-  const call = async (fn) => iface.decodeFunctionResult(fn, await rpc('eth_call', [{ to: DESK, data: iface.encodeFunctionData(fn) }, block]))[0];
-  const onchain = {};
-  for (const k of ['xwan', 'treasury', 'admin']) onchain[k] = (await call(k)).toLowerCase();
-  const rate = await call('rate');
-  const maxRate = await call('MAX_RATE');
 
-  // 3. The getters must equal the addresses this repo states.
-  let ok = true;
-  for (const k of ['xwan', 'treasury', 'admin']) {
-    const m = onchain[k] === EXPECT_ADDR[k];
-    log(`${k.padEnd(8)} ${onchain[k]} ${m ? 'MATCH' : 'MISMATCH, expected ' + EXPECT_ADDR[k]}`);
-    ok = ok && m;
-  }
-  log(`MAX_RATE ${maxRate} ${maxRate === MAX_RATE ? 'MATCH' : 'MISMATCH'}`);
-  ok = ok && maxRate === MAX_RATE;
-  log(`rate     ${rate} (WAN wei per 1 xWAN; the admin may change it)`);
-
-  // 4. The compiled runtime with the stated immutables filled in must equal the code on chain, byte for byte.
+  // 3. The compiled runtime with the stated addresses written into its immutables must equal the code on chain,
+  //    byte for byte. This comes first, so code that differs is a FAIL even when it cannot answer the getters.
   const names = immutableNames(src);
   const b = Buffer.from(d.deployedBytecode.slice(2), 'hex');
   for (const [id, refs] of Object.entries(d.immutableReferences)) {
@@ -112,7 +99,22 @@ async function main() {
   if (!same) for (let i = 0; i < Math.max(live.length, b.length); i++) if (live[i] !== b[i]) { firstDiff = i; break; }
   log(`runtime on chain ${live.length} bytes, sha256 ${liveSha} ${liveSha === DEPLOYED_SHA256 ? 'MATCH' : 'MISMATCH'}`);
   log(`compiled runtime with immutables filled: ${same ? 'IDENTICAL to the code on chain' : 'DIFFERS at byte ' + firstDiff}`);
-  ok = ok && same && liveSha === DEPLOYED_SHA256;
+  let ok = same && liveSha === DEPLOYED_SHA256;
+  if (!same) return fail('CODE_MISMATCH');
+
+  // 4. The getters must equal the addresses this repo states.
+  const iface = new ethers.Interface(d.abi);
+  const call = async (fn) => iface.decodeFunctionResult(fn, await rpc('eth_call', [{ to: DESK, data: iface.encodeFunctionData(fn) }, block]))[0];
+  for (const k of ['xwan', 'treasury', 'admin']) {
+    const got = (await call(k)).toLowerCase();
+    const m = got === EXPECT_ADDR[k];
+    log(`${k.padEnd(8)} ${got} ${m ? 'MATCH' : 'MISMATCH, expected ' + EXPECT_ADDR[k]}`);
+    ok = ok && m;
+  }
+  const maxRate = await call('MAX_RATE');
+  log(`MAX_RATE ${maxRate} ${maxRate === MAX_RATE ? 'MATCH' : 'MISMATCH'}`);
+  ok = ok && maxRate === MAX_RATE;
+  log(`rate     ${await call('rate')} (WAN wei per 1 xWAN; the admin may change it)`);
 
   if (!ok) return fail('CODE_MISMATCH');
   log('VERIFY PASS');

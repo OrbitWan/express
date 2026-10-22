@@ -1,6 +1,6 @@
 # OrbitWan Express
 
-Contracts and dapps on Wanchain, by [OrbitWan](https://orbitwan.io). Each contract here is the exact source of a live contract, and each page is served from this repo exactly as committed.
+Contracts and dapps on Wanchain, by [OrbitWan](https://orbitwan.io). Each contract folder holds the exact source of a live contract (the test-only contracts beside it say so at the top), and each page is served from this repo exactly as committed.
 
 | | Contract | Dapp |
 |---|---|---|

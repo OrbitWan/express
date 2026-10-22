@@ -39,8 +39,8 @@ npm test
 npm run verify
 ```
 
-- `npm test` compiles the contract with solc 0.8.36 (optimizer 200 runs, EVM version paris, because Wanchain does not support PUSH0), checks the fingerprints below and runs 30 checks on a local chain with the test-only contracts in `contracts/XwanDeskTestTokens.sol`.
-- `npm run verify` reads the desk from Wanchain mainnet and checks that its code is this source, byte for byte. It uses Wanchain's public RPC, https://gwan-ssl.wandevs.org:56891; set `RPC_URL` to use your own node. `VERIFY ERROR` means the RPC could not be read, not that the code differs.
+- `npm test` compiles the contract with solc 0.8.36 (optimizer 200 runs, EVM version paris, because Wanchain does not support PUSH0), checks the fingerprints below except the "on chain" line, and runs 30 checks on a local chain with the test-only contracts in `contracts/XwanDeskTestTokens.sol`. On some Node.js versions ganache first prints a warning that a uWS binary does not match your Node.js build; it is harmless and the tests run.
+- `npm run verify` reads the desk from Wanchain mainnet and checks that its code is this source, byte for byte, including the "on chain" fingerprint. It uses Wanchain's public RPC, https://gwan-ssl.wandevs.org:56891; set `RPC_URL` to use your own node. Only `VERIFY PASS` is a pass. `VERIFY FAIL` means the code differs; `VERIFY ERROR` means the check could not finish, most often because the RPC could not be read.
 
 Fingerprints, sha256:
 
