@@ -5,6 +5,7 @@ Contracts and dapps on Wanchain, by [OrbitWan](https://orbitwan.io). Each contra
 | | Contract | Dapp |
 |---|---|---|
 | xWAN Express | [xwan/](xwan/) | https://express.orbitwan.io |
+| OrbitPay | [orbitpay/](orbitpay/) | |
 
 ## The site
 
