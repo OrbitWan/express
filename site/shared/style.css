@@ -33,6 +33,17 @@ a:hover { text-decoration: underline; }
 .brand svg { width: 22px; height: 22px; }
 .brand span { color: var(--dim); }
 .acct { margin-left: auto; font: 13px var(--mono); color: var(--dim); }
+.acctw { margin-left: auto; position: relative; }
+.chip { display: inline-flex; align-items: center; gap: 8px; appearance: none; cursor: pointer; font: 13px var(--mono); color: var(--txt); padding: 5px 10px; border-radius: 9px; background: var(--panel); border: 1px solid var(--line); }
+.chip::after { content: ''; width: 5px; height: 5px; margin-top: -3px; border-right: 1.5px solid var(--dim); border-bottom: 1.5px solid var(--dim); transform: rotate(45deg); }
+.chip:hover:not(:disabled), .chip[aria-expanded="true"] { border-color: var(--accent); }
+.chip:disabled { cursor: default; opacity: .6; }
+.menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 10; min-width: 150px; padding: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, .12); }
+.mi { display: block; width: 100%; text-align: left; appearance: none; cursor: pointer; background: none; border: 0; border-radius: 8px; padding: 9px 12px; color: var(--txt); font: 500 14px var(--body); }
+.mi:hover { background: var(--panel2); color: var(--bad); }
+/* narrow phones: with the account chip shown, the brand keeps its mark and name (and below 350 px the mark alone) */
+@media (max-width: 420px) { .hdrin:has(#acct:not([hidden])) .brand span { display: none; } }
+@media (max-width: 350px) { .hdrin:has(#acct:not([hidden])) .brand { font-size: 0; gap: 0; } }
 .tog { flex: none; appearance: none; cursor: pointer; font: 500 13px var(--body); padding: 5px 12px; border-radius: 9px; background: var(--panel); border: 1px solid var(--line); color: var(--dim); }
 .tog:hover { color: var(--accent); border-color: var(--accent); }
 .tog .td, :root[data-theme="dark"] .tog .tl { display: none; }
@@ -61,8 +72,6 @@ h1 { font: 600 24px var(--head); margin: 0 0 4px; letter-spacing: -.01em; }
 .note { min-height: 21px; margin: 12px 2px 0; font-size: 14px; color: var(--dim); }
 .note.bad { color: var(--bad); }
 .note.good { color: var(--good); }
-.disc { display: block; margin: 8px auto 0; padding: 6px 10px; background: none; border: 0; color: var(--dim); font: 500 13px var(--body); cursor: pointer; }
-.disc:hover { color: var(--accent); }
 
 footer { max-width: 520px; margin: 0 auto; padding: 0 16px 32px; display: flex; justify-content: center; gap: 20px; }
 footer img { display: block; filter: var(--icon); opacity: .55; }

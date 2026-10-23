@@ -204,10 +204,15 @@
     return f ? `${i}.${f}` : i;
   }
   const exact = (wei) => formatUnits(wei, 18).replace(/\.0$/, '');
-  const short = (a) => `${a.slice(0, 6)}...${a.slice(-4)}`;
+  const short = (a) => `${a.slice(0, 6)}\u2026${a.slice(-4)}`;
+  // the header's account chip opens a menu that holds Disconnect; it closes on a choice, Escape or a press elsewhere
+  const menu = (open) => { $('menu').hidden = !open; $('acct').setAttribute('aria-expanded', open ? 'true' : 'false'); };
 
   function render() {
     $('acct').textContent = s.account ? short(s.account) : '';
+    $('acct').hidden = !s.account;
+    $('acct').disabled = !!s.busy;
+    if (!s.account || s.busy) menu(false);
     $('balrow').hidden = $('max').hidden = !(s.account && s.onChain);
     $('bal').textContent = s.xwan === null ? '-' : `${fmt(s.xwan)} xWAN`;
 
@@ -219,7 +224,6 @@
     const a = action();
     $('go').textContent = a.text;
     $('go').disabled = !a.run;
-    $('disc').hidden = !s.account || !!s.busy;
 
     const n = $('note');
     const kind = s.note ? (s.note.kind === 'read' ? 'bad' : s.note.kind) : '';
@@ -257,7 +261,10 @@
   $('amount').addEventListener('input', onInput);
   $('max').addEventListener('click', () => { if (s.xwan !== null) { $('amount').value = exact(s.xwan); onInput(); } });
   $('go').addEventListener('click', onClick);
-  $('disc').addEventListener('click', () => { disconnect().catch(() => {}); });
+  $('acct').addEventListener('click', (e) => { e.stopPropagation(); menu($('menu').hidden); });
+  $('disc').addEventListener('click', () => { menu(false); disconnect().catch(() => {}); });
+  document.addEventListener('click', (e) => { if (!$('menu').hidden && !$('menu').contains(e.target)) menu(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') menu(false); });
   W.on('accountsChanged', async () => { s.approvedNow = false; await syncWallet().catch(() => {}); await refresh(); });
   W.on('chainChanged', async () => { await syncWallet().catch(() => {}); await refresh(); });
   setInterval(() => { if (!document.hidden && !s.busy) refresh(); }, 30000);
