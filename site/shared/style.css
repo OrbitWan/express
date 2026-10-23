@@ -61,6 +61,8 @@ h1 { font: 600 24px var(--head); margin: 0 0 4px; letter-spacing: -.01em; }
 .note { min-height: 21px; margin: 12px 2px 0; font-size: 14px; color: var(--dim); }
 .note.bad { color: var(--bad); }
 .note.good { color: var(--good); }
+.disc { display: block; margin: 8px auto 0; padding: 6px 10px; background: none; border: 0; color: var(--dim); font: 500 13px var(--body); cursor: pointer; }
+.disc:hover { color: var(--accent); }
 
 footer { max-width: 520px; margin: 0 auto; padding: 0 16px 32px; display: flex; justify-content: center; gap: 20px; }
 footer img { display: block; filter: var(--icon); opacity: .55; }

@@ -83,6 +83,12 @@
   }
   async function connect() { await W.connect(); await syncWallet(); await refresh(); }
   async function switchChain() { await W.switchToWanchain(); await syncWallet(); await refresh(); }
+  // The page forgets the account at once and reads the public RPC again; the wallet is asked to end the site's access too.
+  async function disconnect() {
+    W.disconnect();
+    s.approvedNow = false; s.note = { text: 'Disconnected.', kind: '' };
+    await syncWallet(); await refresh();
+  }
 
   // Sends one transaction through the wallet and waits up to WAIT_MS for its receipt. Once the wallet has sent it, only a
   // receipt decides the outcome: a failed read is asked again, and no receipt in time returns ok: null, never a failure.
@@ -213,6 +219,7 @@
     const a = action();
     $('go').textContent = a.text;
     $('go').disabled = !a.run;
+    $('disc').hidden = !s.account || !!s.busy;
 
     const n = $('note');
     const kind = s.note ? (s.note.kind === 'read' ? 'bad' : s.note.kind) : '';
@@ -250,6 +257,7 @@
   $('amount').addEventListener('input', onInput);
   $('max').addEventListener('click', () => { if (s.xwan !== null) { $('amount').value = exact(s.xwan); onInput(); } });
   $('go').addEventListener('click', onClick);
+  $('disc').addEventListener('click', () => { disconnect().catch(() => {}); });
   W.on('accountsChanged', async () => { s.approvedNow = false; await syncWallet().catch(() => {}); await refresh(); });
   W.on('chainChanged', async () => { await syncWallet().catch(() => {}); await refresh(); });
   setInterval(() => { if (!document.hidden && !s.busy) refresh(); }, 30000);
