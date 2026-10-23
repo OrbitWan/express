@@ -8,6 +8,23 @@
   const { Interface, parseUnits, formatUnits } = window.ethers;
   const W = window.Wallet;
 
+  // One release: the page, shared/style.css, shared/wallet.js and this file carry one release id, and every file link
+  // in the page carries ?v= and the first 8 hex of that file's sha256, so a new page never takes an old file from a
+  // cache. A browser may still hold the previous page for a few minutes while the site already answers with the new
+  // files: on a mismatch the page loads itself once more under an address no cache holds (?r=), then runs with what
+  // it has. A matching page drops ?r from the address bar.
+  const BUILD = 'b38c932bc';
+  {
+    const u = new URL(location.href);
+    const css = getComputedStyle(document.documentElement).getPropertyValue('--build').trim();
+    if (document.documentElement.dataset.build !== BUILD || css !== BUILD || !W || W.BUILD !== BUILD) {
+      if (u.searchParams.get('r') !== BUILD) { u.searchParams.set('r', BUILD); location.replace(u.href); return; }
+    } else if (u.searchParams.has('r')) {
+      u.searchParams.delete('r');
+      history.replaceState(null, '', u.href);
+    }
+  }
+
   const CHAIN_ID = 888;
   const RPC = 'https://gwan-ssl.wandevs.org:56891';
   const DESK = '0xcC0ba524134d9625B97569626106B671e6c492f2';

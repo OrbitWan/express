@@ -2,6 +2,7 @@
 // Wallet helpers shared by every OrbitWan Express dapp. They speak EIP-1193 to the wallet the browser provides
 // (MetaMask or any compatible wallet) and never see a key: the wallet signs, the page only asks.
 window.Wallet = (() => {
+  const BUILD = 'b38c932bc'; // release id: the page, shared/style.css and xwan/app.js carry the same one
   const WANCHAIN = {
     chainId: '0x378', // 888
     chainName: 'Wanchain',
@@ -60,5 +61,5 @@ window.Wallet = (() => {
   const rejected = (e) => !!e && (e.code === 4001 || e.code === 'ACTION_REJECTED' ||
     (e.info && e.info.error && e.info.error.code === 4001));
 
-  return { WANCHAIN, eth, accounts, connect, disconnect, chainId, switchToWanchain, on, metamaskLink, rejected };
+  return { BUILD, WANCHAIN, eth, accounts, connect, disconnect, chainId, switchToWanchain, on, metamaskLink, rejected };
 })();
