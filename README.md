@@ -6,6 +6,7 @@ Contracts and dapps on Wanchain, by [OrbitWan](https://orbitwan.io). Each contra
 |---|---|---|
 | xWAN Express | [xwan/](xwan/) | https://express.orbitwan.io |
 | OrbitPay | [orbitpay/](orbitpay/) | |
+| xLend | [OrbitWan/xlend](https://github.com/OrbitWan/xlend) | https://xlend.orbitwan.io |
 
 ## The site
 
@@ -15,7 +16,7 @@ Contracts and dapps on Wanchain, by [OrbitWan](https://orbitwan.io). Each contra
 - Your wallet signs every transaction. The pages never see a key.
 - `site/shared/ethers-6.17.0.umd.min.js` is `dist/ethers.umd.min.js` from the npm package ethers 6.17.0, sha256 `532950515fd29ae9f7a21ceb2b68100815024d7944c3d5a92246d5b900bd703b`. Check it with `npm pack ethers@6.17.0`.
 - Fonts: Space Grotesk and IBM Plex, from @fontsource.
-- Icons: the GitHub mark from @primer/octicons 19.38.0 and the X logo from simple-icons 16.33.0, each linking to OrbitWan's own account. The marks belong to GitHub and X.
+- Icons: a globe drawn for these pages, linking to https://orbitwan.io; the GitHub mark from @primer/octicons 19.38.0, linking to this repo; and the X logo from simple-icons 16.33.0, linking to OrbitWan's account. The marks belong to GitHub and X.
 - Licenses of these files: [`site/shared/licenses/`](site/shared/licenses/).
 
 ## License

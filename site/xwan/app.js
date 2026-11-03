@@ -6,8 +6,13 @@
 //   buy(minXwan) on the sell desk, paying the WAN entered, with minXwan the quote shown (displayed to 6 decimals), after
 //   a fresh quote and a dry run; the sell desk passes the WAN to the desk in the same transaction.
 // Every transaction names chain 888, and the page reads the wallet's chain again just before it sends.
-// Before a wallet connects, reads go to Wanchain's public RPC; after, through the wallet. Nothing else leaves the page.
+// The page's reads go to Wanchain's public RPC, one JSON-RPC batch per refresh, with or without a wallet (through the
+// wallet only when that RPC fails them); the wallet gets only its account and chain, the fresh quote and the dry run just
+// before a transaction, the transaction and its receipt.
+// Nothing else leaves the page.
 (() => {
+  // inside another site's frame the page does not run, so no other site can lay its own page over these buttons
+  if (window.top !== window.self) return;
   const { Interface, parseUnits, formatUnits } = window.ethers;
   const W = window.Wallet;
 
@@ -16,7 +21,7 @@
   // cache. A browser may still hold the previous page for a few minutes while the site already answers with the new
   // files: on a mismatch the page loads itself once more under an address no cache holds (?r=), then runs with what
   // it has. A matching page drops ?r from the address bar.
-  const BUILD = 'b50014525';
+  const BUILD = 'bc31ad92f';
   {
     const u = new URL(location.href);
     const css = getComputedStyle(document.documentElement).getPropertyValue('--build').trim();
@@ -92,12 +97,17 @@
     return iface.decodeFunctionResult(fn, data)[0];
   }
 
-  // The reads of one refresh go out at once: through the wallet side by side, or to the public RPC as one JSON-RPC
-  // batch, one request on one connection (measured 25 Oct 2026: that RPC is HTTP/1.1, about 0.55 s to open a
-  // connection and 0.18 s a call, and it answers a batch of nine in the time of one read). A reply without a result
-  // fails the refresh.
+  // The reads of one refresh go out at once, to the public RPC as one JSON-RPC batch, one request on one connection,
+  // with or without a wallet: that RPC answers a batch in the time of one read, while through a wallet each read is a
+  // request of its own. A reply without a result fails the refresh. When the public RPC fails them and a wallet is
+  // connected on Wanchain, they go through the wallet.
   async function readAll(reqs) {
-    if (s.account && s.onChain) return Promise.all(reqs.map(([method, params]) => W.eth().request({ method, params })));
+    try { return await batch(reqs); } catch (e) {
+      if (s.account && s.onChain) return Promise.all(reqs.map(([method, params]) => W.eth().request({ method, params })));
+      throw e;
+    }
+  }
+  async function batch(reqs) {
     const body = reqs.map(([method, params]) => ({ jsonrpc: '2.0', id: ++rpcId, method, params }));
     const res = await fetch(RPC, {
       method: 'POST', headers: { 'content-type': 'application/json' },
@@ -114,6 +124,8 @@
   }
   const ec = (to, iface, fn, args = []) => ['eth_call', [{ to, data: iface.encodeFunctionData(fn, args) }, 'latest']];
   const dc = (iface, fn, data) => iface.decodeFunctionResult(fn, data)[0];
+  // the quote while an amount is typed: a page read, to the public RPC
+  async function pubCall(to, iface, fn, args = []) { return dc(iface, fn, (await readAll([ec(to, iface, fn, args)]))[0]); }
 
   async function refresh() {
     const acct = s.account && s.onChain ? s.account : null, amount = s.amount, bamount = s.bamount;
@@ -136,14 +148,11 @@
       if (typeof amount === 'bigint') { const q = dc(desk, 'quote', r[i++]); if (s.amount === amount) s.quote = q; }
       if (typeof bamount === 'bigint') { const q = dc(sellDesk, 'quote', r[i++]); if (s.bamount === bamount) s.bquote = q; }
       s.readFailed = false;
-      if (s.note && s.note.kind === 'read') s.note = null;
-      if (s.bnote && s.bnote.kind === 'read') s.bnote = null;
     } catch (e) {
+      // a failed read shows no message: what could not be read shows a dash, and the next refresh reads again
       s.readFailed = true;
       s.rate = s.deskWan = s.quote = null;
       s.price = s.stock = s.bquote = null;
-      s.note = { text: 'Wanchain could not be read. Trying again shortly.', kind: 'read' };
-      s.bnote = { text: 'Wanchain could not be read. Trying again shortly.', kind: 'read' };
     }
     render();
   }
@@ -387,7 +396,7 @@
       $(go).textContent = a.text;
       $(go).disabled = !a.run;
       const n = $(note);
-      const kind = n0 ? (n0.kind === 'read' ? 'bad' : n0.kind) : '';
+      const kind = n0 ? n0.kind : '';
       n.className = kind ? `note ${kind}` : 'note';
       n.textContent = n0 ? n0.text : '';
       if (n0 && n0.hash) {
@@ -407,16 +416,16 @@
     if (!v) s.amount = null;
     else if (!/^\d*\.?\d*$/.test(v) || v === '.') s.amount = 'bad';
     else { try { s.amount = parseUnits(v, 18); if (s.amount > MAX_AMOUNT) s.amount = 'bad'; } catch (e) { s.amount = 'bad'; } }
-    if (s.note && s.note.kind !== 'read') s.note = null;
+    s.note = null;
     render();
     clearTimeout(quoteTimer);
     if (typeof s.amount !== 'bigint' || s.amount === 0n) return;
     const seq = ++quoteSeq, amount = s.amount;
     quoteTimer = setTimeout(async () => {
       try {
-        const q = await call(DESK, desk, 'quote', [amount]);
+        const q = await pubCall(DESK, desk, 'quote', [amount]);
         if (seq === quoteSeq) { s.quote = q; render(); }
-      } catch (e) { if (seq === quoteSeq) { s.readFailed = true; s.note = { text: 'Wanchain could not be read. Trying again shortly.', kind: 'read' }; render(); } }
+      } catch (e) { if (seq === quoteSeq) { s.readFailed = true; render(); } }
     }, 250);
   }
 
@@ -428,16 +437,16 @@
     if (!v) s.bamount = null;
     else if (!/^[0-9]*[.]?[0-9]*$/.test(v) || v === '.') s.bamount = 'bad';
     else { try { s.bamount = parseUnits(v, 18); if (s.bamount > MAX_AMOUNT) s.bamount = 'bad'; } catch (e) { s.bamount = 'bad'; } }
-    if (s.bnote && s.bnote.kind !== 'read') s.bnote = null;
+    s.bnote = null;
     render();
     clearTimeout(bquoteTimer);
     if (typeof s.bamount !== 'bigint' || s.bamount === 0n) return;
     const seq = ++bquoteSeq, amount = s.bamount;
     bquoteTimer = setTimeout(async () => {
       try {
-        const q = await call(SELL, sellDesk, 'quote', [amount]);
+        const q = await pubCall(SELL, sellDesk, 'quote', [amount]);
         if (seq === bquoteSeq) { s.bquote = q; render(); }
-      } catch (e) { if (seq === bquoteSeq) { s.readFailed = true; s.bnote = { text: 'Wanchain could not be read. Trying again shortly.', kind: 'read' }; render(); } }
+      } catch (e) { if (seq === bquoteSeq) { s.readFailed = true; render(); } }
     }, 250);
   }
   // MAX: the WAN balance less GAS_RESERVE, and no more than the whole stock costs
