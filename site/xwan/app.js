@@ -21,7 +21,7 @@
   // cache. A browser may still hold the previous page for a few minutes while the site already answers with the new
   // files: on a mismatch the page loads itself once more under an address no cache holds (?r=), then runs with what
   // it has. A matching page drops ?r from the address bar.
-  const BUILD = 'bc31ad92f';
+  const BUILD = 'bcdf7c9ee';
   {
     const u = new URL(location.href);
     const css = getComputedStyle(document.documentElement).getPropertyValue('--build').trim();
@@ -303,7 +303,7 @@
     return card === s.busyCard ? { text: s.busy } : { text: a.text };
   }
   function walletStep() {
-    if (!W.eth()) return { text: 'Open in MetaMask', run: () => { location.href = W.metamaskLink(); } };
+    if (!W.eth()) return { text: 'Open in MetaMask', ext: true, run: () => { location.href = W.metamaskLink(); } };
     if (!s.account) return { text: 'Connect wallet', run: connect };
     if (!s.onChain) return { text: 'Switch to Wanchain', run: switchChain };
     return null;
@@ -395,6 +395,7 @@
       const a = action(card);
       $(go).textContent = a.text;
       $(go).disabled = !a.run;
+      $(go).classList.toggle('ext', !!a.ext); // the MetaMask link carries its arrow
       const n = $(note);
       const kind = n0 ? n0.kind : '';
       n.className = kind ? `note ${kind}` : 'note';

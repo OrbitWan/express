@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-build="bc31ad92f">
+<html lang="en" data-build="bcdf7c9ee">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,57 +8,70 @@
 <link rel="preconnect" href="https://gwan-ssl.wandevs.org:56891" crossorigin>
 <title>xWAN Express</title>
 <meta name="description" content="Sell xWAN now at the xWAN Express desk on Wanchain.">
-<script src="shared/theme.js?v=4b7e182b"></script>
+<script src="shared/theme.js?v=e246a3f3"></script>
 <link rel="icon" href="shared/icon.svg?v=0e46d894" type="image/svg+xml">
-<link rel="stylesheet" href="shared/style.css?v=f65888a4">
+<link rel="stylesheet" href="shared/style.css?v=042153fc">
 </head>
 <body>
 <header class="hdr">
-  <div class="hdrin">
-    <a class="brand" href="https://orbitwan.io"><svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#2D7FF9"/><circle cx="50" cy="50" r="32" fill="#FFFFFF"/><circle cx="50" cy="50" r="18" fill="#2D7FF9"/></svg>OrbitWan<span>Express</span></a>
-    <div class="acctw"><button class="chip" id="acct" type="button" hidden aria-haspopup="menu" aria-expanded="false"></button><div class="menu" id="menu" role="menu" hidden><button class="mi" id="disc" type="button" role="menuitem">Disconnect</button></div></div>
-    <button class="tog" id="tog" type="button"><span class="tl">Dark</span><span class="td">Light</span></button>
+  <div class="hdr-in">
+    <a class="brand" href="https://orbitwan.io" target="_blank" rel="noopener"><svg class="mk" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.5" fill="#2D7FF9"/><circle cx="50" cy="50" r="32" fill="#FFFFFF"/><circle cx="50" cy="50" r="18" fill="#2D7FF9"/></svg>OrbitWan<span>.io</span></a>
+    <nav class="nav" aria-label="OrbitWan apps"><a href="https://express.orbitwan.io" data-here="./" aria-current="page">Express</a><a href="https://xlend.orbitwan.io" data-here="lend/">xLend</a></nav>
+    <div class="acts">
+      <div class="acctw"><button class="chip" id="acct" type="button" hidden aria-haspopup="menu" aria-expanded="false"></button><div class="menu" id="menu" role="menu" hidden><button class="mi" id="disc" type="button" role="menuitem">Disconnect</button></div></div>
+      <button class="tog" id="tog" type="button"><span class="tl">Dark</span><span class="td">Light</span></button>
+    </div>
   </div>
 </header>
 <main>
 <div class="cards">
   <section class="card" id="sellcard">
-    <h1>Sell xWAN</h1>
-    <p class="sub">Sell now</p>
+    <div class="chead"><h1>Sell xWAN</h1><span class="st sell">Sell now</span></div>
 
-    <label class="lbl" for="amount">You sell</label>
-    <div class="box"><input id="amount" inputmode="decimal" placeholder="0" autocomplete="off" spellcheck="false"><span class="tok">xWAN</span></div>
-    <div class="under"><span id="balrow" hidden>Balance <b id="bal">-</b></span><button class="max" id="max" type="button" hidden>MAX</button></div>
-
-    <span class="lbl">You receive</span>
-    <div class="box"><output id="out">0</output><span class="tok">WAN</span></div>
+    <div class="swap">
+      <div class="field">
+        <label class="lbl" for="amount">You sell</label>
+        <div class="box"><input id="amount" inputmode="decimal" placeholder="0" autocomplete="off" spellcheck="false"><span class="tok" data-i="1">xWAN</span></div>
+        <div class="under"><span id="balrow" hidden>Balance <b id="bal">-</b></span><button class="max" id="max" type="button" hidden>MAX</button></div>
+      </div>
+      <div class="arrow" aria-hidden="true"><span>&#8595;</span></div>
+      <div class="field">
+        <span class="lbl">You receive</span>
+        <div class="box"><output id="out">0</output><span class="tok" data-i="0">WAN</span></div>
+      </div>
+    </div>
 
     <div class="facts">
       <div><span>Rate</span><span id="rate">-</span></div>
       <div><span>Desk balance</span><a id="desk" href="https://orbitwan.io/address/0xcc0ba524134d9625b97569626106b671e6c492f2" target="_blank" rel="noopener">-</a></div>
     </div>
 
-    <button class="btn" id="go" type="button">Connect wallet</button>
+    <button class="btn" id="go" type="button" data-ne="&#8599;">Connect wallet</button>
     <p class="note" id="note" role="status"></p>
   </section>
 
   <section class="card" id="buycard">
-    <h2>Buy xWAN</h2>
-    <p class="sub">Buy now</p>
+    <div class="chead"><h2>Buy xWAN</h2><span class="st good">Buy now</span></div>
 
-    <label class="lbl" for="bamount">You sell</label>
-    <div class="box"><input id="bamount" inputmode="decimal" placeholder="0" autocomplete="off" spellcheck="false"><span class="tok">WAN</span></div>
-    <div class="under"><span id="bbalrow" hidden>Balance <b id="bbal">-</b></span><button class="max" id="bmax" type="button" hidden>MAX</button></div>
-
-    <span class="lbl">You receive</span>
-    <div class="box"><output id="bout">0</output><span class="tok">xWAN</span></div>
+    <div class="swap">
+      <div class="field">
+        <label class="lbl" for="bamount">You sell</label>
+        <div class="box"><input id="bamount" inputmode="decimal" placeholder="0" autocomplete="off" spellcheck="false"><span class="tok" data-i="0">WAN</span></div>
+        <div class="under"><span id="bbalrow" hidden>Balance <b id="bbal">-</b></span><button class="max" id="bmax" type="button" hidden>MAX</button></div>
+      </div>
+      <div class="arrow" aria-hidden="true"><span>&#8595;</span></div>
+      <div class="field">
+        <span class="lbl">You receive</span>
+        <div class="box"><output id="bout">0</output><span class="tok" data-i="1">xWAN</span></div>
+      </div>
+    </div>
 
     <div class="facts">
       <div><span>Rate</span><span id="price">-</span></div>
       <div><span>Desk balance</span><a id="stock" href="https://orbitwan.io/address/0x9cb5d522c16e2a52330156c2e6b31dde4bf9e90c" target="_blank" rel="noopener">-</a></div>
     </div>
 
-    <button class="btn" id="bgo" type="button">Connect wallet</button>
+    <button class="btn" id="bgo" type="button" data-ne="&#8599;">Connect wallet</button>
     <p class="note" id="bnote" role="status"></p>
   </section>
 </div>
@@ -69,7 +82,7 @@
   <a href="https://x.com/orbitwanio" target="_blank" rel="noopener"><img src="shared/x.svg?v=693e6886" alt="OrbitWan on X" width="20" height="20"></a>
 </footer>
 <script src="shared/ethers-6.17.0.umd.min.js?v=53295051"></script>
-<script src="shared/wallet.js?v=180a9d95"></script>
-<script src="xwan/app.js?v=9f471f86"></script>
+<script src="shared/wallet.js?v=0764f563"></script>
+<script src="xwan/app.js?v=e9ad1daa"></script>
 </body>
 </html>

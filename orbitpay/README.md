@@ -19,7 +19,7 @@ Prepaid credit for OrbitWan's paid API and MCP calls, on Wanchain. Deposit wanUS
 2. Call `deposit(token, amount)` to credit yourself, or `depositFor(token, amount, wallet)` to credit another wallet. In the same transaction the tokens go straight to the treasury and the contract emits `Deposited(beneficiary, token, amount)`. OrbitWan credits the beneficiary from that event.
 3. The minimum deposit is 1 token (both tokens have 6 decimals). Any other token reverts, and so does WAN sent to OrbitPay. A plain token transfer to OrbitPay is not a deposit and is not credited: it stays in OrbitPay until the treasury sweeps it.
 
-The credit is a balance OrbitWan keeps off chain for the wallet named in `Deposited`. It is spent by signing requests with that wallet's key (EIP-191, see https://orbitwan.io/docs/orbitpay). Name a wallet whose key you hold: credit to a contract wallet, an exchange address, the zero address or a mistyped address can never be spent. A deposit cannot be withdrawn or refunded on chain.
+The credit is a balance OrbitWan keeps off chain for the wallet named in `Deposited`. It is spent by signing requests with that wallet's key (EIP-191, see https://docs.orbitwan.io/developers/orbitpay/). Name a wallet whose key you hold: credit to a contract wallet, an exchange address, the zero address or a mistyped address can never be spent. A deposit cannot be withdrawn or refunded on chain.
 
 ## Paying from another chain
 
