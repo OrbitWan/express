@@ -21,7 +21,7 @@
   // cache. A browser may still hold the previous page for a few minutes while the site already answers with the new
   // files: on a mismatch the page loads itself once more under an address no cache holds (?r=), then runs with what
   // it has. A matching page drops ?r from the address bar.
-  const BUILD = 'bcdf7c9ee';
+  const BUILD = 'b6530fa5c';
   {
     const u = new URL(location.href);
     const css = getComputedStyle(document.documentElement).getPropertyValue('--build').trim();
@@ -374,6 +374,11 @@
     $('acct').hidden = !s.account;
     $('acct').disabled = !!s.busy;
     if (!s.account || s.busy) menu(false);
+    // the header's wallet button: the first wallet step (Connect wallet, or Open in MetaMask with no wallet in the
+    // browser) until an account is connected (owner, 18 Nov 2026, DAPPV3L)
+    const hw = s.account ? null : walletStep();
+    $('conn').hidden = !hw;
+    if (hw) { if ($('conn').textContent !== hw.text) $('conn').textContent = hw.text; $('conn').disabled = !hw.run || !!s.busy; $('conn').classList.toggle('ext', !!hw.ext); }
     $('balrow').hidden = $('max').hidden = !(s.account && s.onChain);
     // a figure not read yet is blank while the page reads it; a dash means only that Wanchain could not be read
     const none = s.readFailed ? '-' : '';
@@ -464,6 +469,12 @@
   $('bamount').addEventListener('input', onBuyInput);
   $('bmax').addEventListener('click', buyMax);
   $('bgo').addEventListener('click', () => onClick('buy'));
+  $('conn').addEventListener('click', async () => {
+    const a = s.account || s.busy ? null : walletStep();
+    if (!a || !a.run) return;
+    try { await a.run(); } catch (e) { await syncWallet().catch(() => {}); } // a closed or refused wallet window changes nothing
+    render();
+  });
   $('acct').addEventListener('click', (e) => { e.stopPropagation(); menu($('menu').hidden); });
   $('disc').addEventListener('click', () => { menu(false); disconnect().catch(() => {}); });
   document.addEventListener('click', (e) => { if (!$('menu').hidden && !$('menu').contains(e.target)) menu(false); });
